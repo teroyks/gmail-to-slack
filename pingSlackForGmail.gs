@@ -1,6 +1,9 @@
 // posts the message to Slackbot
 // NOTE: insert your Slack webhook URL here.
-var webhookUrl = ""
+var webhookURL = ''
+
+// change notification type to 'plain_text' if your notification messages look weird formatted
+var notificationType = 'mrkdwn'
 
 function notifyOfTaggedMessages() {
   var threads = GmailApp.search('label:notify-slack') // GmailThread[]
@@ -43,7 +46,7 @@ function createMessageBlocks(gmailMessages) {
     msg.isUnread() && blocks.push(dividerBlock, {
       type: 'section',
       text: {
-        type: 'mrkdwn',
+        type: notificationType,
         text: msg.getPlainBody(),
       },
     })
@@ -61,5 +64,5 @@ function pingSlack(content) {
     payload: payload,
   }
   
-  return UrlFetchApp.fetch(webhookUrl, fetchOptions)
+  return UrlFetchApp.fetch(webhookURL, fetchOptions)
 }
