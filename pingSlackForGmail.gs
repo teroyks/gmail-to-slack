@@ -40,7 +40,7 @@ function createMessageBlocks(gmailMessages) {
   var dividerBlock = {type: 'divider'}
   var blocks = []
   for each (var msg in gmailMessages) {
-    blocks.push(dividerBlock, {
+    msg.isUnread() && blocks.push(dividerBlock, {
       type: 'section',
       text: {
         type: 'mrkdwn',
