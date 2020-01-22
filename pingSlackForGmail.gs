@@ -8,29 +8,12 @@ function notifyOfTaggedMessages() {
   
   for each (var thread in threads) {
     var subject = thread.getFirstMessageSubject()
-    var blocks = [{
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: '*' + subject + '*',
-      },
-    }] // notification body blocks (plain text, interpreted as Mrkdwn)
-
     var messages = thread.getMessages() // GmailMessage[]
-    for each (var msg in messages) {
-      var msgBody = msg.getPlainBody()
-      blocks.push({
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: msgBody,
-        },
-      })
-    }
+    var blocks = createMessageBlocks(messages)
     
-    slackPayloadContent = {
+    var slackPayloadContent = {
       text: subject,
-      blocks: blocks,
+      blocks: [createSubjectBlock(subject)].concat(blocks),
     }
 
     var response = pingSlack(slackPayloadContent)
@@ -41,6 +24,32 @@ function notifyOfTaggedMessages() {
       .moveToArchive()
     }
   }
+}
+
+function createSubjectBlock(subject) {
+  return {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: '*' + subject + '*',
+      },
+    }
+}
+
+function createMessageBlocks(gmailMessages) {
+  var dividerBlock = {type: 'divider'}
+  var blocks = []
+  for each (var msg in gmailMessages) {
+    blocks.push(dividerBlock, {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: msg.getPlainBody(),
+      },
+    })
+  }
+  
+  return blocks
 }
 
 function pingSlack(content) {
